@@ -265,7 +265,7 @@ async function startBot() {
       console.log(`[-] ADMIN REMOVED: ${targetJid}`);
     }
 
-    if (command === "!tag") {
+    if (command === "!tag" || command === "!mention") {
       if (!isAuthorized)
         return await sock.sendMessage(
           remoteJid,
