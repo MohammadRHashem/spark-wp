@@ -6,6 +6,7 @@ const {
 } = require("@whiskeysockets/baileys");
 
 const pino = require("pino");
+const qrcode = require("qrcode-terminal");
 const { Boom } = require("@hapi/boom");
 const fs = require("fs");
 
@@ -74,18 +75,33 @@ async function startBot() {
   const sock = makeWASocket({
     version,
     auth: state,
-    printQRInTerminal: true,
     logger: pino({ level: "silent" }),
   });
 
   sock.ev.on("connection.update", (update) => {
-    const { connection, lastDisconnect } = update;
+    const { connection, lastDisconnect, qr } = update;
+
+    if (qr) {
+      console.log("QR code received, generating in terminal...");
+      qrcode.generate(qr, { small: true });
+    }
+
     if (connection === "close") {
       const shouldReconnect =
         lastDisconnect.error instanceof Boom &&
         lastDisconnect.error.output.statusCode !== DisconnectReason.loggedOut;
-      if (shouldReconnect) startBot();
-    } else if (connection === "open") console.log("Connection opened!");
+      console.log(
+        "Connection closed due to:",
+        lastDisconnect.error,
+        ", reconnecting:",
+        shouldReconnect
+      );
+      if (shouldReconnect) {
+        startBot();
+      }
+    } else if (connection === "open") {
+      console.log("Connection opened!");
+    }
   });
 
   sock.ev.on("creds.update", saveCreds);
