@@ -225,7 +225,7 @@ async function startBot() {
                 console.log(`[HTAG] Started process for ${senderJid}. Displaying page 1.`);
             } catch (err) {
                 console.error("[X] Error fetching groups for htag:", err);
-                await sock.sendMessage(senderJid, { text: "❌ A fatal error occurred while fetching the group list." });
+                await sock.sendMessage(senderJid, { text: "❌ A fatal error occurred while fetching group list." });
             }
         }
     });
